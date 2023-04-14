@@ -1,0 +1,6 @@
+deploy:
+  image: gradle:8.0.1-jdk17-alpine
+  script:
+    - 'gradle clean publishPluginMavenPublicationToMavenLocal'
+  only:
+    - main
