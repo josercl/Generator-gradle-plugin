@@ -1,5 +1,6 @@
-package com.gitlab.josercl.init;
+package com.gitlab.josercl.init.creator.impl;
 
+import com.gitlab.josercl.init.creator.ClassCreator;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;

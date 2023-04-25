@@ -1,5 +1,6 @@
-package com.gitlab.josercl.generator;
+package com.gitlab.josercl.generate.generator;
 
+import com.gitlab.josercl.generate.Constants;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.text.CaseUtils;
@@ -11,8 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public abstract class IGenerator {
-    abstract public void generate(String entityName, String basePackage) throws IOException;
+public abstract class AbstractGenerator implements IGenerator{
 
     protected void createDirectories(String pkg, Path modulePath) throws IOException {
         Path first = Path.of(

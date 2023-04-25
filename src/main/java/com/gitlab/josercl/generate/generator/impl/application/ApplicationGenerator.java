@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generator.application;
+package com.gitlab.josercl.generate.generator.impl.application;
 
-import com.gitlab.josercl.generator.Constants;
-import com.gitlab.josercl.generator.IGenerator;
+import com.gitlab.josercl.generate.Constants;
+import com.gitlab.josercl.generate.generator.AbstractGenerator;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -17,7 +17,7 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class ApplicationGenerator extends IGenerator {
+public class ApplicationGenerator extends AbstractGenerator {
 
     private final Path applicationPath = Path.of("application/src/main/java");
 

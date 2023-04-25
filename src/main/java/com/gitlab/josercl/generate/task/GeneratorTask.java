@@ -1,9 +1,9 @@
-package com.gitlab.josercl.tasks;
+package com.gitlab.josercl.generate.task;
 
-import com.gitlab.josercl.generator.IGenerator;
-import com.gitlab.josercl.generator.application.ApplicationGenerator;
-import com.gitlab.josercl.generator.domain.DomainGenerator;
-import com.gitlab.josercl.generator.infrastructure.InfraGenerator;
+import com.gitlab.josercl.generate.generator.IGenerator;
+import com.gitlab.josercl.generate.generator.impl.application.ApplicationGenerator;
+import com.gitlab.josercl.generate.generator.impl.domain.DomainGenerator;
+import com.gitlab.josercl.generate.generator.impl.infrastructure.InfraGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -50,7 +50,7 @@ public class GeneratorTask extends DefaultTask {
 
         for (String entity : ((String) entities).split(",")) {
             for (IGenerator iGenerator : generatorsToUse) {
-                iGenerator.generate(entity, (String) basePackage);
+                iGenerator.generate(entity, basePackage);
             }
         }
     }

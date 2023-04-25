@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generator.infrastructure;
+package com.gitlab.josercl.generate.generator.impl.infrastructure;
 
-import com.gitlab.josercl.generator.Constants;
-import com.gitlab.josercl.generator.IGenerator;
+import com.gitlab.josercl.generate.Constants;
+import com.gitlab.josercl.generate.generator.AbstractGenerator;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class InfraGenerator extends IGenerator {
+public class InfraGenerator extends AbstractGenerator {
 
     private final Path infrastructurePath = Path.of("infrastructure/src/main/java");
 

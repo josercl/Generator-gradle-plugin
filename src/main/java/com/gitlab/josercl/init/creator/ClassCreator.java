@@ -1,9 +1,8 @@
-package com.gitlab.josercl.init;
+package com.gitlab.josercl.init.creator;
 
 import com.squareup.javapoet.JavaFile;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface ClassCreator {
     JavaFile createClass(String basePackage, JavaFile... deps) throws IOException;

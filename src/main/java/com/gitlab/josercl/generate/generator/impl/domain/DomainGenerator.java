@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generator.domain;
+package com.gitlab.josercl.generate.generator.impl.domain;
 
-import com.gitlab.josercl.generator.Constants;
-import com.gitlab.josercl.generator.IGenerator;
+import com.gitlab.josercl.generate.Constants;
+import com.gitlab.josercl.generate.generator.AbstractGenerator;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class DomainGenerator extends IGenerator {
+public class DomainGenerator extends AbstractGenerator {
 
     private final Path domainPath = Path.of("domain/src/main/java");
 

@@ -1,4 +1,4 @@
-package com.gitlab.josercl.generator;
+package com.gitlab.josercl.generate;
 
 public class Constants {
 
