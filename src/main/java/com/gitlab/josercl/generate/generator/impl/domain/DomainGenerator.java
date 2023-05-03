@@ -3,10 +3,12 @@ package com.gitlab.josercl.generate.generator.impl.domain;
 import com.gitlab.josercl.generate.Constants;
 import com.gitlab.josercl.generate.generator.AbstractGenerator;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
 
 import javax.lang.model.element.Modifier;
@@ -40,7 +42,7 @@ public class DomainGenerator extends AbstractGenerator {
 
         String serviceImplPackage = getPackage(basePackage, Constants.Domain.API_IMPL_PACKAGE);
         createDirectories(serviceImplPackage, domainPath);
-        TypeSpec serviceImplSpec = getServiceImplSpec(serviceFile);
+        TypeSpec serviceImplSpec = getServiceImplSpec(serviceFile, portFile);
         JavaFile serviceImplFile = JavaFile.builder(serviceImplPackage, serviceImplSpec).build();
         serviceImplFile.writeToPath(domainPath);
 
@@ -62,10 +64,18 @@ public class DomainGenerator extends AbstractGenerator {
             .build();
     }
 
-    private TypeSpec getServiceImplSpec(JavaFile serviceFile) {
+    private TypeSpec getServiceImplSpec(JavaFile serviceFile, JavaFile portFile) {
         return TypeSpec.classBuilder(CaseUtils.toCamelCase(String.format("%s %s", serviceFile.typeSpec.name, "Impl"), true))
             .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(RequiredArgsConstructor.class)
             .addSuperinterface(ClassName.get(serviceFile.packageName, serviceFile.typeSpec.name))
+            .addField(
+                FieldSpec.builder(
+                    ClassName.get(portFile.packageName, portFile.typeSpec.name),
+                    CaseUtils.toCamelCase(portFile.typeSpec.name, false),
+                    Modifier.PRIVATE, Modifier.FINAL
+                ).build()
+            )
             .build();
     }
 
