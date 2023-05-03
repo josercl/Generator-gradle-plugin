@@ -8,6 +8,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
 
@@ -24,7 +25,7 @@ public class DomainGenerator extends AbstractGenerator {
     public void generate(String entityName, String basePackage) throws IOException {
         String modelPackage = getPackage(basePackage, Constants.Domain.MODEL_PACKAGE);
         createDirectories(modelPackage, domainPath);
-        TypeSpec entityDomainSpec = getEntitySpec(entityName, List.of(), List.of());
+        TypeSpec entityDomainSpec = getEntitySpec(entityName, List.of(Data.class), List.of());
         JavaFile domainModelFile = JavaFile.builder(modelPackage, entityDomainSpec).build();
         domainModelFile.writeToPath(domainPath);
 

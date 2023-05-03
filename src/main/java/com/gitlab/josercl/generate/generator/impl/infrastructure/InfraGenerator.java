@@ -14,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
 import org.mapstruct.Mapper;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -87,6 +88,12 @@ public class InfraGenerator extends AbstractGenerator {
     }
 
     private TypeSpec getMapperSpec(JavaFile entityFile, String basePackage) {
+        ClassName domainType = ClassName.get(
+            basePackage + "." + Constants.Domain.MODEL_PACKAGE,
+            entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, "")
+        );
+        ClassName entityType = ClassName.get(entityFile.packageName, entityFile.typeSpec.name);
+
         return TypeSpec.interfaceBuilder(String.format(
                 "%s%s",
                 entityFile.typeSpec.name,
@@ -101,14 +108,22 @@ public class InfraGenerator extends AbstractGenerator {
             )
             .addMethods(List.of(
                 MethodSpec.methodBuilder("toDomain")
-                    .returns(
-                        ClassName.get(basePackage + "." + Constants.Domain.MODEL_PACKAGE, entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, ""))
-                    )
+                    .returns(domainType)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(
                         ParameterSpec.builder(
-                            ClassName.get(entityFile.packageName, entityFile.typeSpec.name),
+                            entityType,
                             CaseUtils.toCamelCase(entityFile.typeSpec.name, false)
+                        ).build()
+                    )
+                    .build(),
+                MethodSpec.methodBuilder("toEntity")
+                    .returns(entityType)
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addParameter(
+                        ParameterSpec.builder(
+                            domainType,
+                            CaseUtils.toCamelCase(entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, ""), false)
                         ).build()
                     )
                     .build()
@@ -132,17 +147,6 @@ public class InfraGenerator extends AbstractGenerator {
             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
             .build();
 
-        ParameterSpec repositoryParameter = ParameterSpec.builder(repositoryType, "repository").build();
-        ParameterSpec mapperParameter = ParameterSpec.builder(mapperType, "mapper").build();
-
-        MethodSpec constructorSpec = MethodSpec.constructorBuilder()
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(repositoryParameter)
-            .addStatement("this.$N = $N", repositoryField, repositoryParameter)
-            .addParameter(mapperParameter)
-            .addStatement("this.$N = $N", mapperField, mapperParameter)
-            .build();
-
         return TypeSpec.classBuilder(
                 String.format(
                     "%s%s",
@@ -154,7 +158,7 @@ public class InfraGenerator extends AbstractGenerator {
             .addSuperinterface(portType)
             .addField(repositoryField)
             .addField(mapperField)
-            .addMethod(constructorSpec)
+            .addAnnotation(RequiredArgsConstructor.class)
             .build();
     }
 }

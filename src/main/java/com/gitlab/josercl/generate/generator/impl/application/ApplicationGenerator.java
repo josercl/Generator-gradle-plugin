@@ -40,10 +40,7 @@ public class ApplicationGenerator extends AbstractGenerator {
             getPackage(basePackage, Constants.Domain.API_PACKAGE),
             String.format("%s%s", CaseUtils.toCamelCase(entityName, true), Constants.Domain.SERVICE_SUFFIX)
         );
-        ClassName mapperType = ClassName.get(
-            mapperFile.packageName,
-            String.format("%s%s", CaseUtils.toCamelCase(entityName, true), Constants.MAPPER_SUFFIX)
-        );
+        ClassName mapperType = ClassName.get(mapperFile.packageName, mapperFile.typeSpec.name);
 
         FieldSpec serviceField = FieldSpec.builder(serviceType, "service")
             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
@@ -79,7 +76,7 @@ public class ApplicationGenerator extends AbstractGenerator {
     private TypeSpec getMapperSpec(String entityName) {
         return TypeSpec.interfaceBuilder(
                 CaseUtils.toCamelCase(
-                    String.format("%s %s", entityName, Constants.MAPPER_SUFFIX),
+                    String.format("%s api %s", entityName, Constants.MAPPER_SUFFIX),
                     true
                 )
             )
