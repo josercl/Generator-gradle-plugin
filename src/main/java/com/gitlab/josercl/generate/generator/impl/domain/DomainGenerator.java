@@ -22,35 +22,25 @@ public class DomainGenerator extends AbstractGenerator {
     private final Path domainPath = Path.of("domain/src/main/java");
 
     @Override
+    protected Path getModulePath() {
+        return domainPath;
+    }
+
+    @Override
     public void generate(String entityName, String basePackage) throws IOException {
-        String modelPackage = getPackage(basePackage, Constants.Domain.MODEL_PACKAGE);
-        createDirectories(modelPackage, domainPath);
-        TypeSpec entityDomainSpec = getEntitySpec(entityName, List.of(Data.class), List.of());
-        JavaFile domainModelFile = JavaFile.builder(modelPackage, entityDomainSpec).build();
-        domainModelFile.writeToPath(domainPath);
+        generateFile(
+            basePackage,
+            Constants.Domain.MODEL_PACKAGE,
+            () -> getEntitySpec(entityName, List.of(Data.class), List.of())
+        );
 
-        String portPackage = getPackage(basePackage, Constants.Domain.SPI_PACKAGE);
-        createDirectories(portPackage, domainPath);
-        TypeSpec portSpec = getPortSpec(entityName);
-        JavaFile portFile = JavaFile.builder(portPackage, portSpec).build();
-        portFile.writeToPath(domainPath);
+        JavaFile portFile = generateFile(basePackage, Constants.Domain.SPI_PACKAGE, () -> getPortSpec(entityName));
 
-        String servicePackage = getPackage(basePackage, Constants.Domain.API_PACKAGE);
-        createDirectories(servicePackage, domainPath);
-        TypeSpec serviceSpec = getServiceSpec(entityName);
-        JavaFile serviceFile = JavaFile.builder(servicePackage, serviceSpec).build();
-        serviceFile.writeToPath(domainPath);
+        JavaFile serviceFile = generateFile(basePackage, Constants.Domain.API_PACKAGE, () -> getServiceSpec(entityName));
 
-        String serviceImplPackage = getPackage(basePackage, Constants.Domain.API_IMPL_PACKAGE);
-        createDirectories(serviceImplPackage, domainPath);
-        TypeSpec serviceImplSpec = getServiceImplSpec(serviceFile, portFile);
-        JavaFile serviceImplFile = JavaFile.builder(serviceImplPackage, serviceImplSpec).build();
-        serviceImplFile.writeToPath(domainPath);
+        generateFile(basePackage, Constants.Domain.API_IMPL_PACKAGE, () -> getServiceImplSpec(serviceFile, portFile));
 
-        String exceptionPackage = getPackage(basePackage, Constants.Domain.EXCEPTION_PACKAGE);
-        createDirectories(exceptionPackage, domainPath);
-        TypeSpec exceptionSpec = getExceptionSpec(entityName);
-        JavaFile.builder(exceptionPackage, exceptionSpec).build().writeToPath(domainPath);
+        generateFile(basePackage, Constants.Domain.EXCEPTION_PACKAGE, () -> getExceptionSpec(entityName));
     }
 
     private TypeSpec getPortSpec(String entityName) {
@@ -66,7 +56,7 @@ public class DomainGenerator extends AbstractGenerator {
     }
 
     private TypeSpec getServiceImplSpec(JavaFile serviceFile, JavaFile portFile) {
-        return TypeSpec.classBuilder(CaseUtils.toCamelCase(String.format("%s %s", serviceFile.typeSpec.name, "Impl"), true))
+        return TypeSpec.classBuilder(String.format("%sImpl", serviceFile.typeSpec.name))
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(RequiredArgsConstructor.class)
             .addSuperinterface(ClassName.get(serviceFile.packageName, serviceFile.typeSpec.name))

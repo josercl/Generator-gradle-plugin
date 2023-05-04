@@ -6,9 +6,8 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
 import org.mapstruct.Mapper;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,17 +21,23 @@ public class ApplicationGenerator extends AbstractGenerator {
     private final Path applicationPath = Path.of("application/src/main/java");
 
     @Override
-    public void generate(String entityName, String basePackage) throws IOException {
-        String mapperPackage = getPackage(basePackage, Constants.Application.MAPPER_PACKAGE);
-        createDirectories(mapperPackage, applicationPath);
-        TypeSpec mapperSpec = getMapperSpec(entityName);
-        JavaFile mapperFile = JavaFile.builder(mapperPackage, mapperSpec).build();
-        mapperFile.writeToPath(applicationPath);
+    protected Path getModulePath() {
+        return applicationPath;
+    }
 
-        String controllerPackage = getPackage(basePackage, Constants.Application.CONTROLLER_PACKAGE);
-        TypeSpec controllerSpec = getControllerSpec(entityName, mapperFile, basePackage);
-        JavaFile controllerFile = JavaFile.builder(controllerPackage, controllerSpec).build();
-        controllerFile.writeToPath(applicationPath);
+    @Override
+    public void generate(String entityName, String basePackage) throws IOException {
+        JavaFile mapperFile = generateFile(
+            basePackage,
+            Constants.Application.MAPPER_PACKAGE,
+            () -> getMapperSpec(entityName)
+        );
+
+        generateFile(
+            basePackage,
+            Constants.Application.CONTROLLER_PACKAGE,
+            () -> getControllerSpec(entityName, mapperFile, basePackage)
+        );
     }
 
     private TypeSpec getControllerSpec(String entityName, JavaFile mapperFile, String basePackage) {
@@ -49,9 +54,6 @@ public class ApplicationGenerator extends AbstractGenerator {
             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
             .build();
 
-        ParameterSpec serviceParam = ParameterSpec.builder(serviceType, "service").build();
-        ParameterSpec mapperParam = ParameterSpec.builder(mapperType, "mapper").build();
-
         return TypeSpec.classBuilder(
                 CaseUtils.toCamelCase(
                     String.format("%s %s", entityName, Constants.Application.CONTROLLER_SUFFIX),
@@ -60,16 +62,9 @@ public class ApplicationGenerator extends AbstractGenerator {
             )
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(RestController.class)
+            .addAnnotation(RequiredArgsConstructor.class)
             .addField(serviceField)
             .addField(mapperField)
-            .addMethod(
-                MethodSpec.constructorBuilder()
-                    .addParameter(serviceParam)
-                    .addParameter(mapperParam)
-                    .addStatement("this.$N = $N", serviceField, serviceParam)
-                    .addStatement("this.$N = $N", mapperField, mapperParam)
-                    .build()
-            )
             .build();
     }
 

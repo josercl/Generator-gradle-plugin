@@ -31,6 +31,11 @@ public class InfraGenerator extends AbstractGenerator {
     private final Path infrastructurePath = Path.of("infrastructure/src/main/java");
 
     @Override
+    protected Path getModulePath() {
+        return infrastructurePath;
+    }
+
+    @Override
     public void generate(String entityName, String basePackage) throws IOException {
         FieldSpec idFieldSpec = FieldSpec.builder(Long.class, "id", Modifier.PRIVATE)
             .addAnnotation(Id.class)
@@ -47,28 +52,25 @@ public class InfraGenerator extends AbstractGenerator {
             List.of(idFieldSpec)
         );
 
-        String entityPackage = getPackage(basePackage, Constants.Infrastructure.ENTITY_PACKAGE);
-        createDirectories(entityPackage, infrastructurePath);
-        JavaFile entityFile = JavaFile.builder(entityPackage, entitySpec).build();
-        entityFile.writeToPath(infrastructurePath);
+        JavaFile entityFile = generateFile(basePackage, Constants.Infrastructure.ENTITY_PACKAGE, () -> entitySpec);
 
-        String repositoryPackage = getPackage(basePackage, Constants.Infrastructure.REPOSITORY_PACKAGE);
-        createDirectories(repositoryPackage, infrastructurePath);
-        TypeSpec repositorySpec = getRepositorySpec(entityFile, idFieldSpec);
-        JavaFile repositoryFile = JavaFile.builder(repositoryPackage, repositorySpec).build();
-        repositoryFile.writeToPath(infrastructurePath);
+        JavaFile repositoryFile = generateFile(
+            basePackage,
+            Constants.Infrastructure.REPOSITORY_PACKAGE,
+            () -> getRepositorySpec(entityFile, idFieldSpec)
+        );
 
-        String mapperPackage = getPackage(basePackage, Constants.Infrastructure.MAPPER_PACKAGE);
-        createDirectories(mapperPackage, infrastructurePath);
-        TypeSpec mapperSpec = getMapperSpec(entityFile, basePackage);
-        JavaFile mapperFile = JavaFile.builder(mapperPackage, mapperSpec).build();
-        mapperFile.writeToPath(infrastructurePath);
+        JavaFile mapperFile = generateFile(
+            basePackage,
+            Constants.Infrastructure.MAPPER_PACKAGE,
+            () -> getMapperSpec(entityFile, basePackage)
+        );
 
-        String adapterPackage = getPackage(basePackage, Constants.Infrastructure.ADAPTER_PACKAGE);
-        createDirectories(adapterPackage, infrastructurePath);
-        TypeSpec adapterSpec = getAdapterSpec(entityFile, repositoryFile, mapperFile, basePackage);
-        JavaFile adapterFile = JavaFile.builder(adapterPackage, adapterSpec).build();
-        adapterFile.writeToPath(infrastructurePath);
+        generateFile(
+            basePackage,
+            Constants.Infrastructure.ADAPTER_PACKAGE,
+            () -> getAdapterSpec(entityFile, repositoryFile, mapperFile, basePackage)
+        );
     }
 
     private TypeSpec getRepositorySpec(JavaFile entityFile, FieldSpec idFieldSpec) {
