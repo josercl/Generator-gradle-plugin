@@ -13,7 +13,9 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,15 +35,27 @@ public class InitProjectTask extends DefaultTask {
     private final BasePageMapperCreator basePageMapperCreator = BasePageMapperCreator.getInstance();
 
     @TaskAction
-    public void run() {
-        String basePackage = Optional.ofNullable(getProject().getProperties().get("basePackage"))
-            .map(String.class::cast)
-            .orElse((String) getProject().getGroup());
+    public void run() throws IOException {
+        Map<String, ?> projectProperties = getProject().getProperties();
+
+        String basePackage = (String) projectProperties.getOrDefault("basePackage", null);
+
+        if (basePackage == null) {
+            throw new RuntimeException("Usage: gradle initProject -PbasePackage=xxx.yyy.zzz");
+        }
 
         String baseFolder = basePackage.replaceAll("\\.", File.separator);
 
+        writeBuildGradleFile(basePackage);
         initDirectories(baseFolder);
         createClasses(basePackage);
+    }
+
+    private static void writeBuildGradleFile(String basePackage) throws IOException {
+        Path buildGradlePath = Path.of(System.getProperty("user.dir"), "build.gradle");
+        byte[] bytes = Files.readAllBytes(buildGradlePath.toAbsolutePath());
+        String content = new String(bytes).replace("$PKG", basePackage);
+        Files.writeString(buildGradlePath, content, StandardOpenOption.WRITE);
     }
 
     private void initDirectories(String baseFolder) {

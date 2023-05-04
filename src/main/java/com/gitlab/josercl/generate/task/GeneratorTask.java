@@ -30,6 +30,10 @@ public class GeneratorTask extends DefaultTask {
             .map(String.class::cast)
             .orElse((String) getProject().getGroup());
 
+        if (basePackage.equalsIgnoreCase("$PKG")) {
+            throw new RuntimeException("Init project first, execute: gradlew initProject");
+        }
+
         List<IGenerator> generatorsToUse = new ArrayList<>();
 
         if (only == null) {
