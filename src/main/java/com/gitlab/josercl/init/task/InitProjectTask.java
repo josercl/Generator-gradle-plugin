@@ -6,6 +6,7 @@ import com.gitlab.josercl.init.creator.impl.DomainPageCreator;
 import com.gitlab.josercl.init.creator.impl.ErrorHandlerCreator;
 import com.gitlab.josercl.init.creator.impl.MainApplicationCreator;
 import com.gitlab.josercl.init.creator.impl.PersistenceConfigurationCreator;
+import com.gitlab.josercl.init.exception.InitException;
 import com.squareup.javapoet.JavaFile;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InitProjectTask extends DefaultTask {
     private final Map<String, List<String>> modulesDirs = Map.of(
@@ -39,24 +41,34 @@ public class InitProjectTask extends DefaultTask {
     public void run() throws IOException {
         Map<String, ?> projectProperties = project.getProperties();
 
-        String basePackage = (String) projectProperties.getOrDefault("basePackage", null);
+        String basePackage = Optional.ofNullable(projectProperties.get("basePackage"))
+            .map(String.class::cast)
+            .orElseThrow(InitException::new);
 
-        if (basePackage == null) {
-            throw new RuntimeException("Usage: gradle initProject -PbasePackage=xxx.yyy.zzz");
-        }
+        String projectName = Optional.ofNullable(projectProperties.get("projectName"))
+            .map(String.class::cast)
+            .orElseThrow(InitException::new);
 
         String baseFolder = basePackage.replaceAll("\\.", File.separator);
 
+        writeSettingsGradleFile(projectName);
         writeBuildGradleFile(basePackage);
         initDirectories(baseFolder);
         createClasses(basePackage);
+    }
+
+    private void writeSettingsGradleFile(String projectName) throws IOException {
+        Path settingsGradlePath = Path.of(projectPath, "settings.gradle");
+        byte[] bytes = Files.readAllBytes(settingsGradlePath.toAbsolutePath());
+        String content = new String(bytes).replace("spring-boot-gradle-template", projectName);
+        Files.writeString(settingsGradlePath, content, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     private void writeBuildGradleFile(String basePackage) throws IOException {
         Path buildGradlePath = Path.of(projectPath, "build.gradle");
         byte[] bytes = Files.readAllBytes(buildGradlePath.toAbsolutePath());
         String content = new String(bytes).replace("$PKG", basePackage);
-        Files.writeString(buildGradlePath, content, StandardOpenOption.WRITE);
+        Files.writeString(buildGradlePath, content, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     private void initDirectories(String baseFolder) {
@@ -79,16 +91,12 @@ public class InitProjectTask extends DefaultTask {
             });
     }
 
-    private void createClasses(String basePackage) {
-        try {
-            mainApplicationCreator.createClass(basePackage);
-            applicationConfigurationCreator.createClass(basePackage);
-            persistenceConfigurationCreator.createClass(basePackage);
-            errorHandlerCreator.createClass(basePackage);
-            JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
-            basePageMapperCreator.createClass(basePackage, domainPageFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private void createClasses(String basePackage) throws IOException {
+        mainApplicationCreator.createClass(basePackage);
+        applicationConfigurationCreator.createClass(basePackage);
+        persistenceConfigurationCreator.createClass(basePackage);
+        errorHandlerCreator.createClass(basePackage);
+        JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
+        basePageMapperCreator.createClass(basePackage, domainPageFile);
     }
 }
