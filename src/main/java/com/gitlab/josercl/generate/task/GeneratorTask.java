@@ -5,6 +5,7 @@ import com.gitlab.josercl.generate.generator.impl.application.ApplicationGenerat
 import com.gitlab.josercl.generate.generator.impl.domain.DomainGenerator;
 import com.gitlab.josercl.generate.generator.impl.infrastructure.InfraGenerator;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
@@ -19,7 +20,8 @@ public class GeneratorTask extends DefaultTask {
 
     @TaskAction
     public void generate() throws IOException {
-        Map<String, ?> projectProperties = getProject().getProperties();
+        Project project = getProject();
+        Map<String, ?> projectProperties = project.getProperties();
 
         Object entities = projectProperties.getOrDefault("entities", null);
 
@@ -28,7 +30,7 @@ public class GeneratorTask extends DefaultTask {
         Object only = projectProperties.getOrDefault("only", null);
         String basePackage = Optional.ofNullable(projectProperties.getOrDefault("basePackage", null))
             .map(String.class::cast)
-            .orElse((String) getProject().getGroup());
+            .orElse((String) project.getGroup());
 
         if (basePackage.equalsIgnoreCase("$PKG")) {
             throw new RuntimeException("Init project first, execute: gradlew initProject");
@@ -37,17 +39,17 @@ public class GeneratorTask extends DefaultTask {
         List<IGenerator> generatorsToUse = new ArrayList<>();
 
         if (only == null) {
-            generatorsToUse.add(new DomainGenerator());
-            generatorsToUse.add(new InfraGenerator());
-            generatorsToUse.add(new ApplicationGenerator());
+            generatorsToUse.add(new DomainGenerator(project));
+            generatorsToUse.add(new InfraGenerator(project));
+            generatorsToUse.add(new ApplicationGenerator(project));
         } else {
             String[] onlies = ((String) only).split(",");
 
             for (String s : onlies) {
                 switch (s) {
-                    case "domain" -> generatorsToUse.add(new DomainGenerator());
-                    case "infra", "infrastructure" -> generatorsToUse.add(new InfraGenerator());
-                    case "application", "app" -> generatorsToUse.add(new ApplicationGenerator());
+                    case "domain" -> generatorsToUse.add(new DomainGenerator(project));
+                    case "infra", "infrastructure" -> generatorsToUse.add(new InfraGenerator(project));
+                    case "application", "app" -> generatorsToUse.add(new ApplicationGenerator(project));
                 }
             }
         }

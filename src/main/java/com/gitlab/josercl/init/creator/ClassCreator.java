@@ -1,13 +1,20 @@
 package com.gitlab.josercl.init.creator;
 
 import com.squareup.javapoet.JavaFile;
+import org.gradle.api.Project;
 
 import java.io.IOException;
 
-public interface ClassCreator {
-    JavaFile createClass(String basePackage, JavaFile... deps) throws IOException;
+public abstract class ClassCreator {
+    protected final String projectPath;
 
-    default JavaFile createClass(String basePackage) throws IOException {
+    public ClassCreator(Project project) {
+        this.projectPath = project.getProjectDir().getAbsolutePath();
+    }
+
+    public abstract JavaFile createClass(String basePackage, JavaFile... deps) throws IOException;
+
+    protected JavaFile createClass(String basePackage) throws IOException {
         return createClass(basePackage, new JavaFile[]{});
     }
 }

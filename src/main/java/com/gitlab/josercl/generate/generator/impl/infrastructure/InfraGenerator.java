@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
+import org.gradle.api.Project;
 import org.mapstruct.Mapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
@@ -29,6 +30,10 @@ import java.util.List;
 public class InfraGenerator extends AbstractGenerator {
 
     private final Path infrastructurePath = Path.of("infrastructure/src/main/java");
+
+    public InfraGenerator(Project project) {
+        super(project);
+    }
 
     @Override
     protected Path getModulePath() {

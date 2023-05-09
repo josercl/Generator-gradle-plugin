@@ -9,6 +9,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import org.gradle.api.Project;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 
@@ -16,17 +17,19 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class BasePageMapperCreator implements ClassCreator {
+public class BasePageMapperCreator extends ClassCreator {
     private volatile static BasePageMapperCreator instance;
 
-    private BasePageMapperCreator() {}
+    private BasePageMapperCreator(Project project) {
+        super(project);
+    }
 
-    public static BasePageMapperCreator getInstance() {
+    public static BasePageMapperCreator getInstance(Project project) {
         if (instance != null) { return instance; }
         synchronized (new Object()) {
             if (instance != null) { return instance; }
 
-            instance = new BasePageMapperCreator();
+            instance = new BasePageMapperCreator(project);
             return instance;
         }
     }
@@ -72,7 +75,7 @@ public class BasePageMapperCreator implements ClassCreator {
 
         JavaFile mapperFile = JavaFile.builder(destPackage, pageMapperSpec).build();
         mapperFile.writeToPath(Path.of(
-            System.getProperty("user.dir"),
+            projectPath,
             "infrastructure",
             "src", "main", "java"
         ));

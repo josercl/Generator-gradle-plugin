@@ -9,6 +9,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import org.gradle.api.Project;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,17 +28,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ErrorHandlerCreator implements ClassCreator {
+public class ErrorHandlerCreator extends ClassCreator {
     private volatile static ErrorHandlerCreator instance;
 
-    private ErrorHandlerCreator() {}
+    private ErrorHandlerCreator(Project project) {
+        super(project);
+    }
 
-    public static ErrorHandlerCreator getInstance() {
+    public static ErrorHandlerCreator getInstance(Project project) {
         if (instance != null) { return instance; }
         synchronized (new Object()) {
             if (instance != null) { return instance; }
 
-            instance = new ErrorHandlerCreator();
+            instance = new ErrorHandlerCreator(project);
             return instance;
         }
     }
@@ -55,7 +58,7 @@ public class ErrorHandlerCreator implements ClassCreator {
 
         JavaFile javaFile = JavaFile.builder(destPackage, errorHandlerSpec).build();
         javaFile.writeToPath(Path.of(
-                System.getProperty("user.dir"),
+                projectPath,
                 "application",
                 "src", "main", "java"
             ));

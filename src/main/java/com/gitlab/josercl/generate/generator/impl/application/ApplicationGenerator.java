@@ -9,6 +9,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
+import org.gradle.api.Project;
 import org.mapstruct.Mapper;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,10 @@ import java.nio.file.Path;
 public class ApplicationGenerator extends AbstractGenerator {
 
     private final Path applicationPath = Path.of("application/src/main/java");
+
+    public ApplicationGenerator(Project project) {
+        super(project);
+    }
 
     @Override
     protected Path getModulePath() {

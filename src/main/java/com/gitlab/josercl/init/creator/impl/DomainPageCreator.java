@@ -9,23 +9,26 @@ import com.squareup.javapoet.TypeVariableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.gradle.api.Project;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class DomainPageCreator implements ClassCreator {
+public class DomainPageCreator extends ClassCreator {
     private volatile static DomainPageCreator instance;
 
-    private DomainPageCreator() {}
+    private DomainPageCreator(Project project) {
+        super(project);
+    }
 
-    public static DomainPageCreator getInstance() {
+    public static DomainPageCreator getInstance(Project project) {
         if (instance != null) { return instance; }
         synchronized (new Object()) {
             if (instance != null) { return instance; }
 
-            instance = new DomainPageCreator();
+            instance = new DomainPageCreator(project);
             return instance;
         }
     }
@@ -50,7 +53,7 @@ public class DomainPageCreator implements ClassCreator {
 
         JavaFile domainPageFile = JavaFile.builder(destPackage, domainPageSpec).build();
         domainPageFile.writeToPath(Path.of(
-            System.getProperty("user.dir"),
+            projectPath,
             "domain",
             "src", "main", "java"
         ));

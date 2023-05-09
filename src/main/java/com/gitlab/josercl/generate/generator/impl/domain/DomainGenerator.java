@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
+import org.gradle.api.Project;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -20,6 +21,10 @@ import java.util.List;
 public class DomainGenerator extends AbstractGenerator {
 
     private final Path domainPath = Path.of("domain/src/main/java");
+
+    public DomainGenerator(Project project) {
+        super(project);
+    }
 
     @Override
     protected Path getModulePath() {
