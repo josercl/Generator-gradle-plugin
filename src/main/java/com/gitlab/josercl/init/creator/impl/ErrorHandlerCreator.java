@@ -10,6 +10,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.gradle.api.Project;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -50,8 +51,8 @@ public class ErrorHandlerCreator extends ClassCreator {
             .superclass(ResponseEntityExceptionHandler.class)
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(ControllerAdvice.class)
-            .addMethod(getHandleResponseExceptionMethod(basePackage))
-            .addMethod(getHandleMethodArgumentNotValid())
+            .addMethod(getHandleRecordNotFoundException(basePackage))
+            .addMethod(getHandleMethodArgumentNotValid(basePackage))
             .build();
 
         String destPackage = basePackage + ".application";
@@ -65,13 +66,13 @@ public class ErrorHandlerCreator extends ClassCreator {
         return javaFile;
     }
 
-    private MethodSpec getHandleResponseExceptionMethod(String basePackage) {
-        ClassName responseException = ClassName.get("common.exception", "ResponseException");
+    private MethodSpec getHandleRecordNotFoundException(String basePackage) {
+        ClassName responseException = ClassName.get(basePackage + ".domain.exception", "RecordNotFoundException");
         ClassName errorDTO = ClassName.get(basePackage + ".rest.server.model", "ErrorDTO");
         ParameterSpec exArgument = ParameterSpec.builder(responseException, "ex").build();
         ClassName responseEntity = ClassName.get(ResponseEntity.class);
 
-        return MethodSpec.methodBuilder("handleResponseException")
+        return MethodSpec.methodBuilder("handleRecordNotFoundException")
             .addAnnotation(
                 AnnotationSpec.builder(ExceptionHandler.class)
                     .addMember("value", "{$T.class}", responseException)
@@ -81,16 +82,16 @@ public class ErrorHandlerCreator extends ClassCreator {
             .returns(ParameterizedTypeName.get(responseEntity, errorDTO))
             .addParameter(exArgument)
             .addStatement("""
-                return $T.status($N.getCode())
+                return $T.status($T.NOT_FOUND.value())
                 .body(
                     new $T()
-                        .code($N.getCode().value())
+                        .code($T.NOT_FOUND.value())
                         .message($N.getMessage())
-                )""", ResponseEntity.class, exArgument, errorDTO, exArgument, exArgument)
+                )""", ResponseEntity.class, HttpStatus.class, errorDTO, HttpStatus.class, exArgument)
             .build();
     }
 
-    private MethodSpec getHandleMethodArgumentNotValid() {
+    private MethodSpec getHandleMethodArgumentNotValid(String basePackage) {
         Method baseMethod = Arrays.stream(ResponseEntityExceptionHandler.class.getDeclaredMethods())
             .filter(method -> method.getName().equalsIgnoreCase("handleMethodArgumentNotValid"))
             .findFirst()
@@ -172,7 +173,7 @@ public class ErrorHandlerCreator extends ClassCreator {
                         .map(entry -> new ValidationError(entry.getKey(), entry.getValue()))
                         .toList()""",
                 List.class,
-                ClassName.get("common", "ValidationError"),
+                ClassName.get(basePackage + ".domain.error", "ValidationError"),
                 exParameter,
                 Collectors.class,
                 ClassName.get("org.springframework.validation", "FieldError"),

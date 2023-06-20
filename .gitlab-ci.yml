@@ -3,4 +3,4 @@ deploy:
   script:
     - 'gradle clean publishPluginMavenPublicationToGitLabRepository'
   only:
-    - main
+    - tags

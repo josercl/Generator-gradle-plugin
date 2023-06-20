@@ -14,10 +14,6 @@ public class Constants {
         public static final String ADAPTER_SUFFIX = "Adapter";
     }
 
-    public static class Common {
-        public static final String EXCEPTION_PACKAGE = "common.exception";
-    }
-
     public static class Domain {
         public static final String MODEL_PACKAGE = "domain.model";
         public static final String SPI_PACKAGE = "domain.spi";

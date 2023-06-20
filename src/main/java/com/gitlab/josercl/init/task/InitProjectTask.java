@@ -6,6 +6,8 @@ import com.gitlab.josercl.init.creator.impl.DomainPageCreator;
 import com.gitlab.josercl.init.creator.impl.ErrorHandlerCreator;
 import com.gitlab.josercl.init.creator.impl.MainApplicationCreator;
 import com.gitlab.josercl.init.creator.impl.PersistenceConfigurationCreator;
+import com.gitlab.josercl.init.creator.impl.RecordNotFoundExceptionCreator;
+import com.gitlab.josercl.init.creator.impl.ValidationErrorCreator;
 import com.gitlab.josercl.init.exception.InitException;
 import com.squareup.javapoet.JavaFile;
 import org.gradle.api.DefaultTask;
@@ -35,6 +37,8 @@ public class InitProjectTask extends DefaultTask {
     private final ErrorHandlerCreator errorHandlerCreator = ErrorHandlerCreator.getInstance(project);
     private final DomainPageCreator domainPageCreator = DomainPageCreator.getInstance(project);
     private final BasePageMapperCreator basePageMapperCreator = BasePageMapperCreator.getInstance(project);
+    private final ValidationErrorCreator validationErrorCreator = ValidationErrorCreator.getInstance(project);
+    private final RecordNotFoundExceptionCreator recordNotFoundExceptionCreator = RecordNotFoundExceptionCreator.getInstance(project);
     private final String projectPath = project.getProjectDir().getAbsolutePath();
 
     @TaskAction
@@ -98,5 +102,7 @@ public class InitProjectTask extends DefaultTask {
         errorHandlerCreator.createClass(basePackage);
         JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
         basePageMapperCreator.createClass(basePackage, domainPageFile);
+        validationErrorCreator.createClass(basePackage);
+        recordNotFoundExceptionCreator.createClass(basePackage);
     }
 }

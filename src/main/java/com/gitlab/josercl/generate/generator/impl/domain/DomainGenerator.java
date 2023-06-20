@@ -45,7 +45,7 @@ public class DomainGenerator extends AbstractGenerator {
 
         generateFile(basePackage, Constants.Domain.API_IMPL_PACKAGE, () -> getServiceImplSpec(serviceFile, portFile));
 
-        generateFile(basePackage, Constants.Domain.EXCEPTION_PACKAGE, () -> getExceptionSpec(entityName));
+        generateFile(basePackage, Constants.Domain.EXCEPTION_PACKAGE, () -> getExceptionSpec(basePackage, entityName));
     }
 
     private TypeSpec getPortSpec(String entityName) {
@@ -75,7 +75,7 @@ public class DomainGenerator extends AbstractGenerator {
             .build();
     }
 
-    private TypeSpec getExceptionSpec(String entityName) {
+    private TypeSpec getExceptionSpec(String basePackage, String entityName) {
 
         ParameterSpec idParameterSpec = ParameterSpec.builder(
             Long.class,
@@ -89,7 +89,7 @@ public class DomainGenerator extends AbstractGenerator {
                 )
             )
             .addModifiers(Modifier.PUBLIC)
-            .superclass(ClassName.get(Constants.Common.EXCEPTION_PACKAGE, "RecordNotFoundException"))
+            .superclass(ClassName.get(getPackage(basePackage, Constants.Domain.EXCEPTION_PACKAGE), "RecordNotFoundException"))
             .addMethod(
                 MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
