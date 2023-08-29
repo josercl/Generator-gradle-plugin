@@ -2,8 +2,10 @@ package com.gitlab.josercl.init.task;
 
 import com.gitlab.josercl.init.creator.impl.ApplicationConfigurationCreator;
 import com.gitlab.josercl.init.creator.impl.BasePageMapperCreator;
+import com.gitlab.josercl.init.creator.impl.CustomExceptionCreator;
 import com.gitlab.josercl.init.creator.impl.DomainPageCreator;
 import com.gitlab.josercl.init.creator.impl.ErrorHandlerCreator;
+import com.gitlab.josercl.init.creator.impl.ErrorResponseStatusCreator;
 import com.gitlab.josercl.init.creator.impl.MainApplicationCreator;
 import com.gitlab.josercl.init.creator.impl.PersistenceConfigurationCreator;
 import com.gitlab.josercl.init.creator.impl.RecordNotFoundExceptionCreator;
@@ -39,6 +41,8 @@ public class InitProjectTask extends DefaultTask {
     private final BasePageMapperCreator basePageMapperCreator = BasePageMapperCreator.getInstance(project);
     private final ValidationErrorCreator validationErrorCreator = ValidationErrorCreator.getInstance(project);
     private final RecordNotFoundExceptionCreator recordNotFoundExceptionCreator = RecordNotFoundExceptionCreator.getInstance(project);
+    private final ErrorResponseStatusCreator errorResponseStatusCreator = ErrorResponseStatusCreator.getInstance(project);
+    private final CustomExceptionCreator customExceptionCreator = CustomExceptionCreator.getInstance(project);
     private final String projectPath = project.getProjectDir().getAbsolutePath();
 
     @TaskAction
@@ -103,6 +107,8 @@ public class InitProjectTask extends DefaultTask {
         JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
         basePageMapperCreator.createClass(basePackage, domainPageFile);
         validationErrorCreator.createClass(basePackage);
+        customExceptionCreator.createClass(basePackage);
         recordNotFoundExceptionCreator.createClass(basePackage);
+        errorResponseStatusCreator.createClass(basePackage);
     }
 }

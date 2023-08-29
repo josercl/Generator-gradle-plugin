@@ -1,8 +1,6 @@
 package com.gitlab.josercl.init.creator.impl;
 
 import com.gitlab.josercl.init.creator.ClassCreator;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -13,19 +11,19 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class RecordNotFoundExceptionCreator extends ClassCreator {
-    private volatile static RecordNotFoundExceptionCreator instance;
+public class CustomExceptionCreator extends ClassCreator {
+    private volatile static CustomExceptionCreator instance;
 
-    private RecordNotFoundExceptionCreator(Project project) {
+    private CustomExceptionCreator(Project project) {
         super(project);
     }
 
-    public static RecordNotFoundExceptionCreator getInstance(Project project) {
+    public static CustomExceptionCreator getInstance(Project project) {
         if (instance != null) { return instance; }
         synchronized (new Object()) {
             if (instance != null) { return instance; }
 
-            instance = new RecordNotFoundExceptionCreator(project);
+            instance = new CustomExceptionCreator(project);
             return instance;
         }
     }
@@ -34,14 +32,9 @@ public class RecordNotFoundExceptionCreator extends ClassCreator {
     public JavaFile createClass(String basePackage, JavaFile... deps) throws IOException {
         ParameterSpec messageParam = ParameterSpec.builder(String.class, "message", Modifier.FINAL).build();
 
-        TypeSpec typeSpec = TypeSpec.classBuilder("RecordNotFoundException")
+        TypeSpec typeSpec = TypeSpec.classBuilder("CustomException")
             .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(
-                AnnotationSpec.builder(ClassName.get(basePackage + ".domain.exception", "ErrorResponseStatus"))
-                    .addMember("value", "$L", 404)
-                    .build()
-            )
-            .superclass(ClassName.get(basePackage + ".domain.exception", "CustomException"))
+            .superclass(RuntimeException.class)
             .addMethod(
                 MethodSpec.constructorBuilder()
                     .addParameter(messageParam)
@@ -52,12 +45,12 @@ public class RecordNotFoundExceptionCreator extends ClassCreator {
 
         String destPackage = basePackage + ".domain.exception";
 
-        JavaFile recordNotFoundExceptionFile = JavaFile.builder(destPackage, typeSpec).build();
-        recordNotFoundExceptionFile.writeToPath(Path.of(
+        JavaFile customExceptionFile = JavaFile.builder(destPackage, typeSpec).build();
+        customExceptionFile.writeToPath(Path.of(
             projectPath,
             "domain",
             "src", "main", "java"
         ));
-        return recordNotFoundExceptionFile;
+        return customExceptionFile;
     }
 }

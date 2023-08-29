@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ErrorHandlerCreator extends ClassCreator {
     private volatile static ErrorHandlerCreator instance;
@@ -51,7 +52,7 @@ public class ErrorHandlerCreator extends ClassCreator {
             .superclass(ResponseEntityExceptionHandler.class)
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(ControllerAdvice.class)
-            .addMethod(getHandleRecordNotFoundException(basePackage))
+            .addMethod(getHandleCustomErrors(basePackage))
             .addMethod(getHandleMethodArgumentNotValid(basePackage))
             .build();
 
@@ -66,11 +67,13 @@ public class ErrorHandlerCreator extends ClassCreator {
         return javaFile;
     }
 
-    private MethodSpec getHandleRecordNotFoundException(String basePackage) {
-        ClassName responseException = ClassName.get(basePackage + ".domain.exception", "RecordNotFoundException");
+    private MethodSpec getHandleCustomErrors(String basePackage) {
+        ClassName responseException = ClassName.get(basePackage + ".domain.exception", "CustomException");
         ClassName errorDTO = ClassName.get(basePackage + ".rest.server.model", "ErrorDTO");
         ParameterSpec exArgument = ParameterSpec.builder(responseException, "ex").build();
         ClassName responseEntity = ClassName.get(ResponseEntity.class);
+
+        ClassName errorResponseStatus = ClassName.get(basePackage + ".domain.exception", "ErrorResponseStatus");
 
         return MethodSpec.methodBuilder("handleRecordNotFoundException")
             .addAnnotation(
@@ -81,13 +84,15 @@ public class ErrorHandlerCreator extends ClassCreator {
             .addModifiers(Modifier.PROTECTED)
             .returns(ParameterizedTypeName.get(responseEntity, errorDTO))
             .addParameter(exArgument)
+            .addStatement("$T[] classAnnotations = ex.getClass().getAnnotationsByType($T.class);", errorResponseStatus, errorResponseStatus)
+            .addStatement("$T[] superAnnotations = ex.getClass().getSuperclass().getAnnotationsByType($T.class);", errorResponseStatus, errorResponseStatus)
+            .addStatement("$T<$T> annotations = $T.concat($T.stream(classAnnotations), $T.stream(superAnnotations)).toList();", List.class, errorResponseStatus, Stream.class, Arrays.class, Arrays.class)
             .addStatement("""
-                return $T.status($T.NOT_FOUND.value())
-                .body(
-                    new $T()
-                        .code($T.NOT_FOUND.value())
-                        .message($N.getMessage())
-                )""", ResponseEntity.class, HttpStatus.class, errorDTO, HttpStatus.class, exArgument)
+                  int statusCode = annotations.stream()
+                      .findFirst()
+                      .map($T::value)
+                      .orElse($T.INTERNAL_SERVER_ERROR.value())""", errorResponseStatus, HttpStatus.class)
+            .addStatement("return $T.status(statusCode).body(new $T(statusCode, $N.getMessage()))", responseEntity, errorDTO, exArgument)
             .build();
     }
 
