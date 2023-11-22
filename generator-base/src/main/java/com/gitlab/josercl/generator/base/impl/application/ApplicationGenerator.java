@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generate.generator.impl.application;
+package com.gitlab.josercl.generator.base.impl.application;
 
-import com.gitlab.josercl.generate.Constants;
-import com.gitlab.josercl.generate.generator.AbstractGenerator;
+import com.gitlab.josercl.generator.base.Constants;
+import com.gitlab.josercl.generator.base.AbstractGenerator;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -9,7 +9,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
-import org.gradle.api.Project;
 import org.mapstruct.Mapper;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +20,8 @@ public class ApplicationGenerator extends AbstractGenerator {
 
     private final Path applicationPath = Path.of("application/src/main/java");
 
-    public ApplicationGenerator(Project project) {
-        super(project);
+    public ApplicationGenerator(String projectPath) {
+        super(projectPath);
     }
 
     @Override

@@ -1,11 +1,9 @@
-package com.gitlab.josercl.generate.generator;
+package com.gitlab.josercl.generator.base;
 
-import com.gitlab.josercl.generate.Constants;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.text.CaseUtils;
-import org.gradle.api.Project;
 
 import javax.lang.model.element.Modifier;
 import java.io.File;
@@ -19,8 +17,11 @@ public abstract class AbstractGenerator implements IGenerator {
 
     protected final String projectPath;
 
-    public AbstractGenerator(Project project) {
+    /*public AbstractGenerator(Project project) {
         this.projectPath = project.getProjectDir().getAbsolutePath();
+    }*/
+    public AbstractGenerator(String projectPath) {
+        this.projectPath = projectPath;
     }
 
     abstract protected Path getModulePath();

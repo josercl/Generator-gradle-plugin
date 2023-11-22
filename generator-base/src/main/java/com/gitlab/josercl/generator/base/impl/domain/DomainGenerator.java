@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generate.generator.impl.domain;
+package com.gitlab.josercl.generator.base.impl.domain;
 
-import com.gitlab.josercl.generate.Constants;
-import com.gitlab.josercl.generate.generator.AbstractGenerator;
+import com.gitlab.josercl.generator.base.Constants;
+import com.gitlab.josercl.generator.base.AbstractGenerator;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -11,7 +11,6 @@ import com.squareup.javapoet.TypeSpec;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
-import org.gradle.api.Project;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -22,8 +21,8 @@ public class DomainGenerator extends AbstractGenerator {
 
     private final Path domainPath = Path.of("domain/src/main/java");
 
-    public DomainGenerator(Project project) {
-        super(project);
+    public DomainGenerator(String projectPath) {
+        super(projectPath);
     }
 
     @Override

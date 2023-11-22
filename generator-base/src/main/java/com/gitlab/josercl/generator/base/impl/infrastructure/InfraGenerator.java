@@ -1,7 +1,7 @@
-package com.gitlab.josercl.generate.generator.impl.infrastructure;
+package com.gitlab.josercl.generator.base.impl.infrastructure;
 
-import com.gitlab.josercl.generate.Constants;
-import com.gitlab.josercl.generate.generator.AbstractGenerator;
+import com.gitlab.josercl.generator.base.AbstractGenerator;
+import com.gitlab.josercl.generator.base.Constants;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -16,7 +16,6 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
-import org.gradle.api.Project;
 import org.mapstruct.Mapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
@@ -31,8 +30,8 @@ public class InfraGenerator extends AbstractGenerator {
 
     private final Path infrastructurePath = Path.of("infrastructure/src/main/java");
 
-    public InfraGenerator(Project project) {
-        super(project);
+    public InfraGenerator(String projectPath) {
+        super(projectPath);
     }
 
     @Override

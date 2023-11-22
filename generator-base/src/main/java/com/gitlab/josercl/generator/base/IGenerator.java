@@ -1,4 +1,4 @@
-package com.gitlab.josercl.generate.generator;
+package com.gitlab.josercl.generator.base;
 
 import java.io.IOException;
 

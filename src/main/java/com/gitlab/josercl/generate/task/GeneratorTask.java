@@ -1,9 +1,9 @@
 package com.gitlab.josercl.generate.task;
 
-import com.gitlab.josercl.generate.generator.IGenerator;
-import com.gitlab.josercl.generate.generator.impl.application.ApplicationGenerator;
-import com.gitlab.josercl.generate.generator.impl.domain.DomainGenerator;
-import com.gitlab.josercl.generate.generator.impl.infrastructure.InfraGenerator;
+import com.gitlab.josercl.generator.base.IGenerator;
+import com.gitlab.josercl.generator.base.impl.application.ApplicationGenerator;
+import com.gitlab.josercl.generator.base.impl.domain.DomainGenerator;
+import com.gitlab.josercl.generator.base.impl.infrastructure.InfraGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
@@ -38,18 +38,19 @@ public class GeneratorTask extends DefaultTask {
 
         List<IGenerator> generatorsToUse = new ArrayList<>();
 
+        String projectPath = project.getProjectDir().getAbsolutePath();
         if (only == null) {
-            generatorsToUse.add(new DomainGenerator(project));
-            generatorsToUse.add(new InfraGenerator(project));
-            generatorsToUse.add(new ApplicationGenerator(project));
+            generatorsToUse.add(new DomainGenerator(projectPath));
+            generatorsToUse.add(new InfraGenerator(projectPath));
+            generatorsToUse.add(new ApplicationGenerator(projectPath));
         } else {
             String[] onlies = ((String) only).split(",");
 
             for (String s : onlies) {
                 switch (s) {
-                    case "domain" -> generatorsToUse.add(new DomainGenerator(project));
-                    case "infra", "infrastructure" -> generatorsToUse.add(new InfraGenerator(project));
-                    case "application", "app" -> generatorsToUse.add(new ApplicationGenerator(project));
+                    case "domain" -> generatorsToUse.add(new DomainGenerator(projectPath));
+                    case "infra", "infrastructure" -> generatorsToUse.add(new InfraGenerator(projectPath));
+                    case "application", "app" -> generatorsToUse.add(new ApplicationGenerator(projectPath));
                 }
             }
         }
