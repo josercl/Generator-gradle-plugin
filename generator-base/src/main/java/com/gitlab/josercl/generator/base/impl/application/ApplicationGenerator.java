@@ -84,6 +84,7 @@ public class ApplicationGenerator extends AbstractGenerator {
                 AnnotationSpec.builder(Mapper.class)
                     .addMember("injectionStrategy", "$L", "org.mapstruct.InjectionStrategy.CONSTRUCTOR")
                     .addMember("componentModel", "$L", "org.mapstruct.MappingConstants.ComponentModel.SPRING")
+                    .addMember("unmappedTargetPolicy", "$L", "org.mapstruct.ReportingPolicy.IGNORE")
                     .build()
             )
             .build();
