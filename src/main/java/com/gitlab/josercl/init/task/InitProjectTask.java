@@ -100,15 +100,15 @@ public class InitProjectTask extends DefaultTask {
     }
 
     private void createClasses(String basePackage) throws IOException {
-        mainApplicationCreator.createClass(basePackage);
-        applicationConfigurationCreator.createClass(basePackage);
-        persistenceConfigurationCreator.createClass(basePackage);
+//        mainApplicationCreator.createClass(basePackage);
+//        applicationConfigurationCreator.createClass(basePackage);
+//        persistenceConfigurationCreator.createClass(basePackage);
         errorHandlerCreator.createClass(basePackage);
-        JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
-        basePageMapperCreator.createClass(basePackage, domainPageFile);
-        validationErrorCreator.createClass(basePackage);
-        customExceptionCreator.createClass(basePackage);
-        recordNotFoundExceptionCreator.createClass(basePackage);
-        errorResponseStatusCreator.createClass(basePackage);
+//        JavaFile domainPageFile = domainPageCreator.createClass(basePackage);
+//        basePageMapperCreator.createClass(basePackage, domainPageFile);
+//        validationErrorCreator.createClass(basePackage);
+//        customExceptionCreator.createClass(basePackage);
+//        recordNotFoundExceptionCreator.createClass(basePackage);
+//        errorResponseStatusCreator.createClass(basePackage);
     }
 }

@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.gradle.api.Project;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -38,16 +39,21 @@ public class ErrorHandlerCreator extends ClassCreator {
     }
 
     public static ErrorHandlerCreator getInstance(Project project) {
-        if (instance != null) { return instance; }
+        if (instance != null) {
+            return instance;
+        }
         synchronized (new Object()) {
-            if (instance != null) { return instance; }
+            if (instance != null) {
+                return instance;
+            }
 
             instance = new ErrorHandlerCreator(project);
             return instance;
         }
     }
+
     @Override
-    public JavaFile createClass(String basePackage, JavaFile ...deps) throws IOException {
+    public JavaFile createClass(String basePackage, JavaFile... deps) throws IOException {
         TypeSpec errorHandlerSpec = TypeSpec.classBuilder("ErrorHandler")
             .superclass(ResponseEntityExceptionHandler.class)
             .addModifiers(Modifier.PUBLIC)
@@ -60,10 +66,10 @@ public class ErrorHandlerCreator extends ClassCreator {
 
         JavaFile javaFile = JavaFile.builder(destPackage, errorHandlerSpec).build();
         javaFile.writeToPath(Path.of(
-                projectPath,
-                "application",
-                "src", "main", "java"
-            ));
+            projectPath,
+            "application",
+            "src", "main", "java"
+        ));
         return javaFile;
     }
 
@@ -74,25 +80,29 @@ public class ErrorHandlerCreator extends ClassCreator {
         ClassName responseEntity = ClassName.get(ResponseEntity.class);
 
         ClassName errorResponseStatus = ClassName.get(basePackage + ".domain.exception", "ErrorResponseStatus");
+        ClassName problemDetail = ClassName.get(ProblemDetail.class);
 
-        return MethodSpec.methodBuilder("handleRecordNotFoundException")
+        return MethodSpec.methodBuilder("handleCustomErrors")
             .addAnnotation(
                 AnnotationSpec.builder(ExceptionHandler.class)
                     .addMember("value", "{$T.class}", responseException)
                     .build()
             )
             .addModifiers(Modifier.PROTECTED)
-            .returns(ParameterizedTypeName.get(responseEntity, errorDTO))
+            .returns(ParameterizedTypeName.get(responseEntity, problemDetail))
             .addParameter(exArgument)
             .addStatement("$T[] classAnnotations = ex.getClass().getAnnotationsByType($T.class);", errorResponseStatus, errorResponseStatus)
             .addStatement("$T[] superAnnotations = ex.getClass().getSuperclass().getAnnotationsByType($T.class);", errorResponseStatus, errorResponseStatus)
             .addStatement("$T<$T> annotations = $T.concat($T.stream(classAnnotations), $T.stream(superAnnotations)).toList();", List.class, errorResponseStatus, Stream.class, Arrays.class, Arrays.class)
             .addStatement("""
-                  int statusCode = annotations.stream()
-                      .findFirst()
-                      .map($T::value)
-                      .orElse($T.INTERNAL_SERVER_ERROR.value())""", errorResponseStatus, HttpStatus.class)
-            .addStatement("return $T.status(statusCode).body(new $T(statusCode, $N.getMessage()))", responseEntity, errorDTO, exArgument)
+                int statusCode = annotations.stream()
+                    .findFirst()
+                    .map($T::value)
+                    .orElse($T.INTERNAL_SERVER_ERROR.value())""", errorResponseStatus, HttpStatus.class)
+            //.addStatement("return $T.status(statusCode).body(new $T(statusCode, $N.getMessage()))", responseEntity, errorDTO, exArgument)
+            .addStatement("$T problemDetail = $T.forStatus(statusCode)", problemDetail, problemDetail)
+            .addStatement("problemDetail.setDetail(ex.getMessage())")
+            .addStatement("return $T.status(statusCode).body(problemDetail)", responseEntity)
             .build();
     }
 
@@ -165,6 +175,7 @@ public class ErrorHandlerCreator extends ClassCreator {
             builder.addException(thrownType);
         }
 
+        ClassName problemDetailClass = ClassName.get(ProblemDetail.class);
         builder.addStatement("""
                     $T<$T> errorList = $N.getBindingResult()
                         .getFieldErrors()
@@ -184,7 +195,9 @@ public class ErrorHandlerCreator extends ClassCreator {
                 ClassName.get("org.springframework.validation", "FieldError"),
                 ClassName.get("org.springframework.context.support", "DefaultMessageSourceResolvable")
             )
-            .addStatement("return $T.unprocessableEntity().body(errorList)", baseMethod.getReturnType());
+            .addStatement("$T problemDetail = $T.forStatus($T.UNPROCESSABLE_ENTITY)", problemDetailClass, problemDetailClass, HttpStatus.class)
+            .addStatement("problemDetail.setProperty(\"errors\", errorList)")
+            .addStatement("return $T.unprocessableEntity().body(problemDetail)", baseMethod.getReturnType());
 
         return builder.build();
     }
