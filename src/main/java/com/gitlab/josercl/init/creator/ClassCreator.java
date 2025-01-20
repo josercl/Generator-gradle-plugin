@@ -1,6 +1,6 @@
 package com.gitlab.josercl.init.creator;
 
-import com.squareup.javapoet.JavaFile;
+import com.palantir.javapoet.JavaFile;
 import org.gradle.api.Project;
 
 import java.io.IOException;

@@ -2,12 +2,12 @@ package com.gitlab.josercl.generator.base.impl.domain;
 
 import com.gitlab.josercl.generator.base.Constants;
 import com.gitlab.josercl.generator.base.AbstractGenerator;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.TypeSpec;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
@@ -60,14 +60,14 @@ public class DomainGenerator extends AbstractGenerator {
     }
 
     private TypeSpec getServiceImplSpec(JavaFile serviceFile, JavaFile portFile) {
-        return TypeSpec.classBuilder(String.format("%sImpl", serviceFile.typeSpec.name))
+        return TypeSpec.classBuilder(String.format("%sImpl", serviceFile.typeSpec().name()))
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(RequiredArgsConstructor.class)
-            .addSuperinterface(ClassName.get(serviceFile.packageName, serviceFile.typeSpec.name))
+            .addSuperinterface(ClassName.get(serviceFile.packageName(), serviceFile.typeSpec().name()))
             .addField(
                 FieldSpec.builder(
-                    ClassName.get(portFile.packageName, portFile.typeSpec.name),
-                    CaseUtils.toCamelCase(portFile.typeSpec.name, false),
+                    ClassName.get(portFile.packageName(), portFile.typeSpec().name()),
+                    CaseUtils.toCamelCase(portFile.typeSpec().name(), false),
                     Modifier.PRIVATE, Modifier.FINAL
                 ).build()
             )
@@ -93,7 +93,7 @@ public class DomainGenerator extends AbstractGenerator {
                 MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(idParameterSpec)
-                    .addStatement("super($S + $L)", entityName + " not found: ", idParameterSpec.name)
+                    .addStatement("super($S + $L)", entityName + " not found: ", idParameterSpec.name())
                     .build()
             )
             .build();

@@ -1,11 +1,11 @@
 package com.gitlab.josercl.init.creator.impl;
 
 import com.gitlab.josercl.init.creator.ClassCreator;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.ParameterizedTypeName;
+import com.palantir.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeVariableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

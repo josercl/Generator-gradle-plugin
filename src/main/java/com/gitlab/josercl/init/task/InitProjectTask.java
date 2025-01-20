@@ -11,7 +11,6 @@ import com.gitlab.josercl.init.creator.impl.PersistenceConfigurationCreator;
 import com.gitlab.josercl.init.creator.impl.RecordNotFoundExceptionCreator;
 import com.gitlab.josercl.init.creator.impl.ValidationErrorCreator;
 import com.gitlab.josercl.init.exception.InitException;
-import com.squareup.javapoet.JavaFile;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;

@@ -2,14 +2,14 @@ package com.gitlab.josercl.generator.base.impl.infrastructure;
 
 import com.gitlab.josercl.generator.base.AbstractGenerator;
 import com.gitlab.josercl.generator.base.Constants;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.AnnotationSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.ParameterizedTypeName;
+import com.palantir.javapoet.TypeSpec;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -78,17 +78,17 @@ public class InfraGenerator extends AbstractGenerator {
     }
 
     private TypeSpec getRepositorySpec(JavaFile entityFile, FieldSpec idFieldSpec) {
-        ClassName entityType = ClassName.get(entityFile.packageName, entityFile.typeSpec.name);
+        ClassName entityType = ClassName.get(entityFile.packageName(), entityFile.typeSpec().name());
 
         return TypeSpec
-            .interfaceBuilder(String.format("%s%s", entityFile.typeSpec.name, Constants.Infrastructure.REPOSITORY_SUFFIX))
+            .interfaceBuilder(String.format("%s%s", entityFile.typeSpec().name(), Constants.Infrastructure.REPOSITORY_SUFFIX))
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(Repository.class)
             .addSuperinterface(
-                ParameterizedTypeName.get(ClassName.get(CrudRepository.class), entityType, idFieldSpec.type)
+                ParameterizedTypeName.get(ClassName.get(CrudRepository.class), entityType, idFieldSpec.type())
             )
             .addSuperinterface(
-                ParameterizedTypeName.get(ClassName.get(JpaRepository.class), entityType, idFieldSpec.type)
+                ParameterizedTypeName.get(ClassName.get(JpaRepository.class), entityType, idFieldSpec.type())
             )
             .build();
     }
@@ -96,13 +96,13 @@ public class InfraGenerator extends AbstractGenerator {
     private TypeSpec getMapperSpec(JavaFile entityFile, String basePackage) {
         ClassName domainType = ClassName.get(
             basePackage + "." + Constants.Domain.MODEL_PACKAGE,
-            entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, "")
+            entityFile.typeSpec().name().replace(Constants.Infrastructure.MODEL_SUFFIX, "")
         );
-        ClassName entityType = ClassName.get(entityFile.packageName, entityFile.typeSpec.name);
+        ClassName entityType = ClassName.get(entityFile.packageName(), entityFile.typeSpec().name());
 
         return TypeSpec.interfaceBuilder(String.format(
                 "%s%s",
-                entityFile.typeSpec.name,
+                entityFile.typeSpec().name(),
                 Constants.MAPPER_SUFFIX)
             )
             .addModifiers(Modifier.PUBLIC)
@@ -120,7 +120,7 @@ public class InfraGenerator extends AbstractGenerator {
                     .addParameter(
                         ParameterSpec.builder(
                             entityType,
-                            CaseUtils.toCamelCase(entityFile.typeSpec.name, false)
+                            CaseUtils.toCamelCase(entityFile.typeSpec().name(), false)
                         ).build()
                     )
                     .build(),
@@ -130,7 +130,7 @@ public class InfraGenerator extends AbstractGenerator {
                     .addParameter(
                         ParameterSpec.builder(
                             domainType,
-                            CaseUtils.toCamelCase(entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, ""), false)
+                            CaseUtils.toCamelCase(entityFile.typeSpec().name().replace(Constants.Infrastructure.MODEL_SUFFIX, ""), false)
                         ).build()
                     )
                     .build()
@@ -139,11 +139,11 @@ public class InfraGenerator extends AbstractGenerator {
     }
 
     private TypeSpec getAdapterSpec(JavaFile entityFile, JavaFile repositoryFile, JavaFile mapperFile, String basePackage) {
-        ClassName repositoryType = ClassName.get(repositoryFile.packageName, repositoryFile.typeSpec.name);
-        ClassName mapperType = ClassName.get(mapperFile.packageName, mapperFile.typeSpec.name);
+        ClassName repositoryType = ClassName.get(repositoryFile.packageName(), repositoryFile.typeSpec().name());
+        ClassName mapperType = ClassName.get(mapperFile.packageName(), mapperFile.typeSpec().name());
         ClassName portType = ClassName.get(
             basePackage + "." + Constants.Domain.SPI_PACKAGE,
-            portName(entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, ""))
+            portName(entityFile.typeSpec().name().replace(Constants.Infrastructure.MODEL_SUFFIX, ""))
         );
 
         FieldSpec repositoryField = FieldSpec.builder(repositoryType, "repository")
@@ -157,7 +157,7 @@ public class InfraGenerator extends AbstractGenerator {
         return TypeSpec.classBuilder(
                 String.format(
                     "%s%s",
-                    entityFile.typeSpec.name.replace(Constants.Infrastructure.MODEL_SUFFIX, ""),
+                    entityFile.typeSpec().name().replace(Constants.Infrastructure.MODEL_SUFFIX, ""),
                     Constants.Infrastructure.ADAPTER_SUFFIX
                 )
             )

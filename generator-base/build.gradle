@@ -7,10 +7,6 @@ group = "${project.parent.group}"
 version = "${project.parent.version}"
 
 repositories {
-    maven {
-        name = 'Fabric'
-        url = 'https://maven.fabricmc.net/'
-    }
     mavenCentral()
 }
 
@@ -18,9 +14,9 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.30'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.apache.commons:commons-text:1.10.0'
-    implementation 'net.fabricmc:javapoet:0.1.0' //JavaPoet fork with record support
-    implementation 'org.springframework:spring-web:6.1.5'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.2.4'
+    implementation 'com.palantir.javapoet:javapoet:0.6.0'
+    implementation 'org.springframework:spring-webmvc:6.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.3'
 }
 
 publishing {

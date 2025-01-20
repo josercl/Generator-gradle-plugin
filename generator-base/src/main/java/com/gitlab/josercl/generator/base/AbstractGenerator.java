@@ -1,8 +1,8 @@
 package com.gitlab.josercl.generator.base;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.TypeSpec;
 import org.apache.commons.text.CaseUtils;
 
 import javax.lang.model.element.Modifier;
@@ -17,9 +17,6 @@ public abstract class AbstractGenerator implements IGenerator {
 
     protected final String projectPath;
 
-    /*public AbstractGenerator(Project project) {
-        this.projectPath = project.getProjectDir().getAbsolutePath();
-    }*/
     public AbstractGenerator(String projectPath) {
         this.projectPath = projectPath;
     }

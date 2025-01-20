@@ -1,9 +1,9 @@
 package com.gitlab.josercl.init.creator.impl;
 
 import com.gitlab.josercl.init.creator.ClassCreator;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.AnnotationSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.TypeSpec;
 import org.gradle.api.Project;
 import org.springframework.context.annotation.Configuration;
 

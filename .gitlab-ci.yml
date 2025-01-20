@@ -1,7 +1,8 @@
 deploy:
-  image: gradle:8.0.1-jdk17-alpine
+  image: gradle:8.7-jdk21-alpine
   script:
-    - 'gradle :generator-base:clean :generator-base:publishMavenPublicationToGitLabRepository'
-    - 'gradle clean publishPluginMavenPublicationToGitLabRepository'
+    - 'chmod +x ./gradlew'
+    - './gradlew :generator-base:clean :generator-base:publishMavenPublicationToGitLabRepository'
+    - './gradlew clean publishPluginMavenPublicationToGitLabRepository'
   only:
     - tags

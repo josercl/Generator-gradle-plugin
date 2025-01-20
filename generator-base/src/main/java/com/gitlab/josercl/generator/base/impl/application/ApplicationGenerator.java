@@ -2,11 +2,11 @@ package com.gitlab.josercl.generator.base.impl.application;
 
 import com.gitlab.josercl.generator.base.Constants;
 import com.gitlab.josercl.generator.base.AbstractGenerator;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.AnnotationSpec;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.TypeSpec;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.CaseUtils;
 import org.mapstruct.Mapper;
@@ -49,7 +49,7 @@ public class ApplicationGenerator extends AbstractGenerator {
             getPackage(basePackage, Constants.Domain.API_PACKAGE),
             String.format("%s%s", CaseUtils.toCamelCase(entityName, true), Constants.Domain.SERVICE_SUFFIX)
         );
-        ClassName mapperType = ClassName.get(mapperFile.packageName, mapperFile.typeSpec.name);
+        ClassName mapperType = ClassName.get(mapperFile.packageName(), mapperFile.typeSpec().name());
 
         FieldSpec serviceField = FieldSpec.builder(serviceType, "service")
             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
