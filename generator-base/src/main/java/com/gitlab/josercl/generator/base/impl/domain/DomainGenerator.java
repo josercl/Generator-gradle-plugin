@@ -2,6 +2,7 @@ package com.gitlab.josercl.generator.base.impl.domain;
 
 import com.gitlab.josercl.generator.base.Constants;
 import com.gitlab.josercl.generator.base.AbstractGenerator;
+import com.palantir.javapoet.AnnotationSpec;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.FieldSpec;
 import com.palantir.javapoet.JavaFile;
@@ -42,7 +43,7 @@ public class DomainGenerator extends AbstractGenerator {
 
         JavaFile serviceFile = generateFile(basePackage, Constants.Domain.API_PACKAGE, () -> getServiceSpec(entityName));
 
-        generateFile(basePackage, Constants.Domain.API_IMPL_PACKAGE, () -> getServiceImplSpec(serviceFile, portFile));
+        generateFile(basePackage, Constants.Domain.API_IMPL_PACKAGE, () -> getServiceImplSpec(basePackage, serviceFile, portFile));
 
         generateFile(basePackage, Constants.Domain.EXCEPTION_PACKAGE, () -> getExceptionSpec(basePackage, entityName));
     }
@@ -59,10 +60,13 @@ public class DomainGenerator extends AbstractGenerator {
             .build();
     }
 
-    private TypeSpec getServiceImplSpec(JavaFile serviceFile, JavaFile portFile) {
+    private TypeSpec getServiceImplSpec(String basePackage, JavaFile serviceFile, JavaFile portFile) {
+        System.out.println(basePackage);
+        System.out.println(Constants.Domain.ANNOTATION_PACKAGE);
         return TypeSpec.classBuilder(String.format("%sImpl", serviceFile.typeSpec().name()))
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(RequiredArgsConstructor.class)
+            .addAnnotation(ClassName.get(basePackage + "." + Constants.Domain.ANNOTATION_PACKAGE, "DomainService"))
             .addSuperinterface(ClassName.get(serviceFile.packageName(), serviceFile.typeSpec().name()))
             .addField(
                 FieldSpec.builder(

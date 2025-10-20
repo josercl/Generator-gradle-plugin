@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.gitlab.josercl'
-version = '1.4.0'
+version = '1.4.1'
 sourceCompatibility = 21
 targetCompatibility = 21
 
@@ -32,7 +32,7 @@ dependencies {
     implementation 'org.springframework:spring-webmvc:6.2.1'
     implementation 'org.springframework.boot:spring-boot-test-autoconfigure:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.3'
-    implementation 'com.palantir.javapoet:javapoet:0.6.0'
+    implementation 'com.palantir.javapoet:javapoet:0.7.0'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     implementation project(':generator-base')
 }

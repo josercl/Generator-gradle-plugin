@@ -19,6 +19,7 @@ public class Constants {
         public static final String SPI_PACKAGE = "domain.spi";
         public static final String API_PACKAGE = "domain.api";
         public static final String EXCEPTION_PACKAGE = "domain.exception";
+        public static final String ANNOTATION_PACKAGE = "domain.annotations";
         public static final String API_IMPL_PACKAGE = API_PACKAGE + ".impl";
         public static final String SERVICE_SUFFIX = "Service";
         public static final String PORT_SUFFIX = "Port";
